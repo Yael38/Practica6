@@ -1,0 +1,121 @@
+% Predicado para obtener las raíces de una ecuación cuadrática
+raices_ecuacion_cuadratica(A, B, C, X1, X2) :-
+    Discriminante is B * B - 4 * A * C,  
+    Discriminante >= 0,                   
+    Raiz_discriminante is sqrt(Discriminante),  
+    X1 is (-B + Raiz_discriminante) / (2 * A),  
+    X2 is (-B - Raiz_discriminante) / (2 * A).  
+
+
+% Predicado que determina si un número está en la base indicada
+esta_en_base(N, Base) :-
+    N >= 0,                 
+    Base >= 2,              
+    esta_en_base_aux(N, Base).
+
+% Predicado auxiliar que realiza la conversión
+esta_en_base_aux(0, _).          
+esta_en_base_aux(N, Base) :- 
+    N < Base,                  
+    N >= 0.                    
+esta_en_base_aux(N, Base) :-
+    N >= Base,                 
+    Restante is N // Base,     
+    esta_en_base_aux(Restante, Base).  
+
+
+
+
+% base_conversion(+Numero, +Base, -Resultado)
+% Convierte Numero (base 10) a una lista de dígitos en la Base dada.
+base_conversion(0, _, [0]) :- !.  % Caso especial para el número 0.
+base_conversion(Numero, Base, Resultado) :-
+    Numero > 0,
+    Div is Numero // Base,
+    Resto is Numero mod Base,
+    base_conversion(Div, Base, DigitosParciales),
+    append(DigitosParciales, [Resto], Resultado).
+
+% Para facilitar la impresión del resultado como un número en lugar de una lista:
+convertir_a_base(Numero, Base, Resultado) :-
+    base_conversion(Numero, Base, Digitos),
+    atomic_list_concat(Digitos, '', ResultadoAtomico),
+    atom_number(ResultadoAtomico, Resultado).
+
+
+
+% digito_mayor(+Numero, -DigitoMayor)
+% Encuentra el dígito mayor de un número entero.
+digito_mayor(Numero, DigitoMayor) :-
+    atom_chars(Numero, DigitosAtomicos),
+    maplist(atom_number, DigitosAtomicos, Digitos),
+    max_list(Digitos, DigitoMayor).
+
+
+
+% contar_digito(+Numero, +Digito, -Conteo)
+% Cuenta cuántas veces aparece el Digito en el Numero.
+contar_digito(Numero, Digito, Conteo) :-
+    atom_chars(Numero, DigitosAtomicos), 
+    maplist(atom_number, DigitosAtomicos, Digitos), 
+    include(=(Digito), Digitos, DigitosFiltrados), 
+    length(DigitosFiltrados, Conteo). 
+
+
+
+% ultima_posicion(+Numero, +Digito, -Posicion)
+% Encuentra la posición donde el Digito aparece por última vez en el Numero.
+% Si no aparece, devuelve 0.
+ultima_posicion(Numero, Digito, Posicion) :-
+    atom_chars(Numero, DigitosAtomicos),       
+    maplist(atom_number, DigitosAtomicos, Digitos), 
+    reverse(Digitos, DigitosReverso),         
+    nth1(PosicionInversa, DigitosReverso, Digito), 
+    length(Digitos, Longitud),                
+    Posicion is Longitud - PosicionInversa + 1, !. 
+ultima_posicion(_, _, 0).                     
+
+
+
+% rotar_izquierda(+Numero, +N, -Resultado)
+% Rota un número entero N posiciones a la izquierda.
+rotar_izquierda(Numero, N, Resultado) :-
+    atom_chars(Numero, DigitosAtomicos),       
+    maplist(atom_number, DigitosAtomicos, Digitos), 
+    length(Digitos, Longitud),                
+    R is N mod Longitud,                      
+    append(Inicio, Final, Digitos),           
+    length(Inicio, R),                        
+    append(Final, Inicio, DigitosRotados),   
+    atomic_list_concat(DigitosRotados, '', ResultadoAtomico), 
+    atom_number(ResultadoAtomico, Resultado). 
+
+
+
+% Cuadrado: A = s^2
+cuadrado(S, A) :- 
+    A is S ** 2.
+
+% Rectángulo: A = b * h
+rectangulo(B, H, A) :- 
+    A is B * H.
+
+% Paralelogramo: A = b * h
+paralelogramo(B, H, A) :- 
+    A is B * H.
+
+% Trapezoide: A = (a + b) / 2 * h
+trapezoide(A, B, H, Area) :- 
+    Area is ((A + B) / 2) * H.
+
+% Triángulo: A = 1/2 * b * h
+triangulo(B, H, A) :- 
+    A is (1/2) * B * H.
+
+% Elipse: A = pi * a * b
+elipse(A, B, Area) :- 
+    Area is pi * A * B.
+
+% Círculo: A = pi * r^2
+circulo(R, A) :- 
+    A is pi * R ** 2.
